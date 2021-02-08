@@ -1,0 +1,107 @@
+
+ * 2021.02.05-08. tárgymutatót próbálok csinálni könyvhöz
+
+   i a könyv, amihez a tárgymutatót szeretnénk: [mnym/input.pdf] (!)
+
+   i a `make` által való gyártás lépései (!) :)
+     i  _így megy az egész egyben:_ 
+       $ make full_run
+     o pdf --totxt--> txt --ana--> ana --detok--> lemma(txt) --freqlist--> fq
+     o pdf + lemma(txt) --pagenums--> pagenums
+     o pagenums + fq --index--> index
+       e elvben lehetne egyszerűsíteni így:
+         * pdf --totxt--> txt --ana--> ana --detok--> lemma_w_pagenums --freqlist--> fq
+         * lemma_w_pagenums + fq --index--> index
+
+   +1] pdf -> txt
+       $ make totxt -> [mnym/input.txt]
+
+   k2] feldolgozottság szempontjából teljesen azonosnak
+       kell lennie a szövegnek és a két gyaklistának! (!)
+       k lower: mnsz nagybetűsek kihagyva (miért is?)
+                mnym minden eredetiben
+       + tövezni kell a mnym-t,
+         mert úgy értelmes a dolog -- és persze a mnsz is tövezve van!
+         $ make ana -> [mnym/ana.csv]
+         $ make detok_lemma -> [mnym/lemma.txt]
+           -> tabos quntoken hibajelzés :)
+       + but -> bu; dit -> d; analyse -> analys -- hiba javítva
+         ezeket a guesser okozza!
+         mivel az összes fura szóalakra szükségünk van:
+          o idegen szavak: but, dit, analyse...
+          o fura magyar elemek: hazud, esz...
+         => ez a trükk:
+            ha nincs elemzés akkor a szóalakot vesszük lemmának! (!)
+            -- ti. kb. tuti, h a guesser üres elemzésnél kapcsol be!
+       ! vhogy előfordul, hogy nincs lemma -> emtsv bugreport, ha tényleg! (!)
+
+   +3] gyaklista-készítés a lemmaizált könyvből
+       $ make freqlist -> [mnym/fq.csv]
+
+   k4] gyaklista-összevetés: input gyl <--> MNSZ gyl
+     + szóval csinálok/tam gyaklista-összevetőt
+       -- ami még  _sok minden másra_  jó lesz! (!) XXX :)
+       -- de kiváló eszköz a tárgymutató-készítéshez is!
+       $ make freqlists_test -> compare.out
+       => a kimenet elején szépen ott vannak az első gyaklistára/korpuszra jellemző szavak
+          -- ránézésre teljesen oké! (!) XXX :) 
+     k még nézegessem a kimenetet :)
+     x 
+     ! kéne kezdeni vmit a  _0-szor előforduló szavakkal_  is,
+       bár nem nagyon valószínű, hogy volna olyan szó,
+       ami egy 55000 szavas könyvben benne van és az MNSZ-ben nincs :)
+       ! de van! pl.: 'fapt' (129.o), 'ekklisía' (91.o) (!)
+       x a floatinf.py volt az ötletem, de elég bonyolult! :)
+       - line#58-60 ezek főleg ragozott és írásjeles szavak,
+         szóval rendes tokenizálás+tövezés nélkül nem látszik,
+         hogy fog-e kelleni innen bármi is XXX       
+     x 
+     e ha túl gyakori a szó, akkor talán nem kell a tárgymutatóba,
+       mert az kb. a címe a könyvnek...
+       -> de úgyis át kell válogatni kézzel
+          a gyaklista-összevetés eredményét :)
+       -> a nagyon sok oldalon előforduló szavakat
+          kézzel betettem a [./exclude_list.txt] -be
+     x 
+     e olyan persze nem tud lenni, hogy kiemelt/definiáló említés,
+       ti. honnan a fenéből tudnám! :)
+       e esetleg: az az oldal, ahol kiemelten sokszor szerepel...
+         vagy ahol sok oldalon át szerepel! (!) XXX :)
+
+   x5] kijött "kulcsszavak" kézi átnézése
+       $ cat compare.out | head -500 | sort > compare.out.manual
+       -- hm.. ez nagy munka,
+          és nem is biztos, hogy bármit ki kellene hagyni
+       => szóval egyelőre kimarad ez a lépés! :)
+
+   +6] oldalszámos txt készítése a pdf-ből
+     $ make pagenums -> [mnym/pagenums.txt]
+
+   +7] szavak kikeresgélése = melyik szó hányadik oldalon forddul elő
+       $ make index -> [mnym/index.html] és [mnym/index.pdf]
+       --  _ez király!_  (!) :)
+
+   +8] ellenőrzés
+       x teljesen sima szavak: 'akkor' -- nem lemma az mnsz-ben!
+         a 'nincs' biztos ugyanígy...
+         - hát ja, ua elemzővel kéne elemezni mindent
+       -> ezek mehetnek az exclude_list.txt -be -- pipa :)
+
+   +9] "publikálás"
+       + elküldeni N. tanárúrnak pdf-ben:
+          _=> [mnym/index.pdf]  _<= (!!!)
+       e majd esetleg kitenni a netre
+         e hm.. a kiadó nem fog problémázni, ugye?
+
+-----
+
+   ! trivi továbblépés
+     - brutetok helyett quntoken 
+     - miért is fq>=10 MNSZ gyaklistát használok vajon?
+     - 0-szor előforduló szavak -- ld. fent
+
+   - továbbfejlesztés -- majd egyszer :)
+     - bigramok, trigramok... :) -- az unigramok vannak ugye meg :)
+     - isz-k... :) -- pl. "tükröz -t" <-- tutira kijön! :)
+     - oldaltörésre eső szavak: "egysze" -- hát igen, ez külön nóta!
+

@@ -1,3 +1,18 @@
+
+*/*.pdf
+*/input.pdf
+*/input.txt
+*/ana.csv
+*/lemma.txt
+*/fq.csv
+*/*pagenums.txt
+*/index.html
+*/index.pdf
+
+*/compare.out
+
+# -----
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
