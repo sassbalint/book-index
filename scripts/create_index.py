@@ -7,15 +7,9 @@ to a freqlist of general text.
 import argparse
 from collections import defaultdict
 from functools import cmp_to_key
-
 import locale
 
-
 import freqlists as fl
-
-
-# XXX ez jelenleg `make with_pagenumbers` révén jön létre!
-BOOK_WITH_PAGENUMBERS = "mnym_with_pagenumbers.txt"
 
 locale.setlocale(locale.LC_ALL, 'hu_HU.UTF-8')
 
